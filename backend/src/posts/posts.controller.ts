@@ -1,4 +1,4 @@
-import { Controller, Post, Param, Body } from '@nestjs/common';
+import { Controller, Post, Param, Body, Get } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -17,5 +17,11 @@ export class PostsController {
     @Body('content') content: string, // Get content from Body
   ) {
     return this.postsService.publishPost(+userId, content);
+  }
+
+  // GET http://localhost:3000/posts/history/1
+  @Get('history/:userId')
+  async getPostHistory(@Param('userId') userId: string) {
+    return this.postsService.getPostsByUser(+userId);
   }
 }

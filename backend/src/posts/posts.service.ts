@@ -149,4 +149,12 @@ export class PostsService {
       throw new Error('Failed to publish to LinkedIn.');
     }
   }
+
+  // 4. Function to get User's Post History
+  async getPostsByUser(userId: number) {
+    return this.postsRepository.find({
+      where: { linkedinAccount: { user: { id: userId } } },
+      order: { created_at: 'DESC' }, // Show newest ones first
+    });
+  }
 }
