@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreatePreferenceDto } from './dto/create-preference.dto';
 
@@ -19,5 +19,11 @@ export class UsersController {
     @Body() createPreferenceDto: CreatePreferenceDto,
   ) {
     return this.usersService.savePreferences(+id, createPreferenceDto);
+  }
+
+  // DELETE http://localhost:3000/users/1
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.usersService.remove(+id);
   }
 }

@@ -18,7 +18,7 @@ export class UsersService {
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
-      relations: ['linkedinAccount', 'preference'], // Get with preferences too
+      relations: ['linkedinAccount', 'preference', 'linkedinAccount.oauthToken'], 
     });
     if (!user) throw new NotFoundException('User not found');
     return user;
@@ -45,5 +45,10 @@ export class UsersService {
     }
 
     return this.preferenceRepository.save(preference);
+  }
+
+  async remove(id: number) {
+    const user = await this.findOne(id);
+    return this.usersRepository.remove(user);
   }
 }
