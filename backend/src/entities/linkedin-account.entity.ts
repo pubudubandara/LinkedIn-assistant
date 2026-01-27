@@ -23,7 +23,7 @@ export class LinkedInAccount {
   @Column({ nullable: true })
   profile_image: string;
 
-  @OneToOne(() => User, (user) => user.linkedinAccount)
+  @OneToOne(() => User, (user) => user.linkedinAccount, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 

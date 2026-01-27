@@ -11,7 +11,7 @@ export class LinkedInStrategy extends PassportStrategy(Strategy, 'linkedin') {
       clientID: configService.get<string>('LINKEDIN_CLIENT_ID')!,
       clientSecret: configService.get<string>('LINKEDIN_CLIENT_SECRET')!,
       callbackURL: configService.get<string>('LINKEDIN_REDIRECT_URI')!,
-      scope: ['openid', 'profile', 'email'], // New Scopes ,w_member_social removed
+      scope: ['openid', 'profile', 'email', 'w_member_social'], // New Scopes 
       state: true,
       passReqToCallback: false,
       skipUserProfile: true, // Stop getting data from the library (because it's outdated)
