@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import axios from 'axios';
 
 // Interfaces
@@ -23,7 +23,7 @@ interface UserProfile {
   };
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const userId = searchParams.get('id');
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -223,5 +223,13 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
