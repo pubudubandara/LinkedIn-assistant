@@ -42,6 +42,9 @@ export default function Dashboard() {
   const [generatedPost, setGeneratedPost] = useState('');
   const [generating, setGenerating] = useState(false);
 
+  // Publishing State
+  const [publishing, setPublishing] = useState(false);
+
   // Fetch User Data
   const fetchUser = () => {
     if (userId) {
@@ -95,6 +98,22 @@ export default function Dashboard() {
       alert('Failed to generate post. Check backend console.');
     }
     setGenerating(false);
+  };
+
+  // Handle Publish Post
+  const handlePublish = async () => {
+    if (!generatedPost) return;
+    setPublishing(true);
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/publish/${userId}`, {
+        content: generatedPost
+      });
+      alert('Post Published Successfully! 🚀');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to publish. Check if "Share on LinkedIn" is enabled in Developer Portal.');
+    }
+    setPublishing(false);
   };
 
   if (loading) return <div className="p-10 text-center">Loading User Data...</div>;
@@ -189,8 +208,12 @@ export default function Dashboard() {
                 ></textarea>
                 
                 <div className="mt-4 flex justify-end">
-                  <button className="bg-green-600 text-white py-2 px-6 rounded hover:bg-green-700 shadow">
-                    Publish to LinkedIn 🚀 (Coming Soon)
+                  <button 
+                    onClick={handlePublish}
+                    disabled={publishing}
+                    className="bg-green-600 text-white py-2 px-6 rounded hover:bg-green-700 shadow disabled:bg-gray-400"
+                  >
+                    {publishing ? 'Publishing...' : 'Publish to LinkedIn 🚀'}
                   </button>
                 </div>
               </div>
