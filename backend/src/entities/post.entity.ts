@@ -18,6 +18,6 @@ export class Post {
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => LinkedInAccount, (account) => account.posts)
+  @ManyToOne(() => LinkedInAccount, (account) => account.posts, { onDelete: 'CASCADE' })
   linkedinAccount: LinkedInAccount;
 }

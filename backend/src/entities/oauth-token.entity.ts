@@ -18,7 +18,7 @@ export class OAuthToken {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToOne(() => LinkedInAccount, (account) => account.oauthToken)
+  @OneToOne(() => LinkedInAccount, (account) => account.oauthToken, { onDelete: 'CASCADE' })
   @JoinColumn()
   linkedinAccount: LinkedInAccount;
 }

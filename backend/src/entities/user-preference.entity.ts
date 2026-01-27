@@ -21,7 +21,7 @@ export class UserPreference {
   @Column()
   content_tone: string;
 
-  @OneToOne(() => User, (user) => user.preference)
+  @OneToOne(() => User, (user) => user.preference, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 }
