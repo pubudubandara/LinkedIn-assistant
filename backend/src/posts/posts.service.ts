@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Post as PostEntity } from '../entities/post.entity';
+import axios from 'axios';
 
 @Injectable()
 export class PostsService {
@@ -11,6 +15,9 @@ export class PostsService {
   constructor(
     private configService: ConfigService,
     private usersService: UsersService,
+
+    @InjectRepository(PostEntity)
+    private postsRepository: Repository<PostEntity>,
   ) {
     // Initialize Gemini API
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
@@ -42,7 +49,7 @@ export class PostsService {
 
       Instructions:
       - The post should be engaging and professional.
-      -Use engaging Emojis throughout the text (at least 3-4 emojis).
+      - Use engaging Emojis throughout the text (at least 3-4 emojis).
       - Keep it under 200 words.
       - Add 3-5 relevant hashtags.
       - Do NOT allow any markdown formatting like **bold** or *italic*. Plain text only.
@@ -62,6 +69,84 @@ export class PostsService {
     } catch (error) {
       console.error('Gemini AI Error:', error);
       throw new Error('Failed to generate post using Gemini AI.');
+    }
+  }
+
+
+  async publishPost(userId: number, content: string) {
+    // Get User and Token details
+    const user = await this.usersService.findOne(userId);
+    const linkedinAccount = user.linkedinAccount;
+    const accessToken = linkedinAccount.oauthToken?.access_token;
+
+    if (!accessToken) {
+      throw new Error('No access token found. Please login again.');
+    }
+
+    // Format Author URN correctly
+    let authorUrn = linkedinAccount.linkedin_urn;
+    if (!authorUrn.startsWith('urn:li:person:')) {
+      authorUrn = `urn:li:person:${authorUrn}`;
+    }
+
+    try {
+      console.log('Publishing to LinkedIn...'); // Debug log
+
+      // Body to send to LinkedIn API
+      const postBody = {
+        author: authorUrn,
+        lifecycleState: 'PUBLISHED',
+        specificContent: {
+          'com.linkedin.ugc.ShareContent': {
+            shareCommentary: {
+              text: content,
+            },
+            shareMediaCategory: 'NONE',
+          },
+        },
+        visibility: {
+          'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
+        },
+      };
+
+      // API Call
+      const response = await axios.post(
+        'https://api.linkedin.com/v2/ugcPosts',
+        postBody,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'X-Restli-Protocol-Version': '2.0.0',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      console.log('LinkedIn Response:', response.data); // Logs if successful
+
+      const linkedinPostId = response.data.id;
+
+      // Save to Database (Success)
+      const newPost = this.postsRepository.create({
+        content: content,
+        linkedin_post_id: linkedinPostId,
+        status: 'published',
+        linkedinAccount: linkedinAccount,
+      });
+      return await this.postsRepository.save(newPost);
+
+    } catch (error) {
+      // Detailed error logging
+      console.error('LinkedIn Publish Error Details:', error.response?.data || error.message);
+      
+      const failedPost = this.postsRepository.create({
+        content: content,
+        status: 'failed',
+        linkedinAccount: linkedinAccount,
+      });
+      await this.postsRepository.save(failedPost);
+
+      throw new Error('Failed to publish to LinkedIn.');
     }
   }
 }
