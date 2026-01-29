@@ -15,6 +15,7 @@ A full-stack application that integrates with the official LinkedIn API to authe
 - [API Endpoints](#-api-endpoints)
 - [Limitations & Notes](#-limitations--notes)
 - [Testing the Flow](#-testing-the-flow)
+- [Project Screenshots](#-project-screenshots)
 - [Author](#author)
 
 ---
@@ -74,9 +75,9 @@ LinkedIn-MVP-Assistant/
     ├── src/
     │   ├── app/
     │   │   ├── dashboard/     # Main Dashboard Page
+    │   │   │   └── [id]/
     │   │   └── layout.js
     │   └── components/        # Reusable UI Components
-    ├── public/
     └── package.json
 ```
 
@@ -213,6 +214,23 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
 7.  Check the **Post History** table at the bottom for the status.
 
 ---
+
+## 📸 Project Screenshots
+
+### 1. Public Page UI (Landing Page)
+![Public Page UI](./screenshots/li-as1.png)
+
+### 2. LinkedIn Login
+![LinkedIn Login](./screenshots/li-as2.png)
+
+### 3. Admin Dashboard
+![Admin UI 1](./screenshots/li-as3.png)
+
+### 4. User Preferences & Settings
+![Admin UI 2](./screenshots/li-as4.png)
+
+### 5. Content Generation & History
+![Admin UI 3](./screenshots/li-as5.png)
 
 ## Author
 **Pubudu Bandara**

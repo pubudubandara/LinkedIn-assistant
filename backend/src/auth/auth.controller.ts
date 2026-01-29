@@ -28,9 +28,9 @@ export class AuthController {
     // Store user ID in session
     req.session.userId = user.id;
     
-    // Redirect to the Frontend
+    // Redirect to the Frontend with user ID in URL
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    res.redirect(`${frontendUrl}/dashboard`);
+    res.redirect(`${frontendUrl}/dashboard/${user.id}`);
   }
 
   // 3. Logout Route
