@@ -15,6 +15,7 @@ A full-stack application that integrates with the official LinkedIn API to authe
 - [API Endpoints](#-api-endpoints)
 - [Limitations & Notes](#-limitations--notes)
 - [Testing the Flow](#-testing-the-flow)
+- [Project Screenshots](#-project-screenshots)
 - [Author](#author)
 
 ---
@@ -197,9 +198,8 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
 
 ## ⚠️ Limitations & Notes
 
-1.  **LinkedIn Headline:** The application uses the modern OpenID Connect (OIDC) flow. LinkedIn's OIDC userinfo endpoint does not return the user's Headline field (unlike the deprecated `r_liteprofile`). Therefore, the headline field remains empty in the dashboard.
-2.  **Scopes Required:** To publish posts, the LinkedIn App must have the **Share on LinkedIn** product enabled (Scope: `w_member_social`).
-3.  **Token Expiry:** LinkedIn access tokens typically last for 60 days. The system stores `expires_in` data to manage this.
+1.  **Scopes Required:** To publish posts, the LinkedIn App must have the **Share on LinkedIn** product enabled (Scope: `w_member_social`).
+2.  **Token Expiry:** LinkedIn access tokens typically last for 60 days. The system stores `expires_in` data to manage this.
 
 ---
 
@@ -214,6 +214,23 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
 7.  Check the **Post History** table at the bottom for the status.
 
 ---
+
+## 📸 Project Screenshots
+
+### 1. Public Page UI (Landing Page)
+![Public Page UI](./screenshots/li-as1.png)
+
+### 2. LinkedIn Login
+![LinkedIn Login](./screenshots/li-as2.png)
+
+### 3. Admin Dashboard
+![Admin UI 1](./screenshots/li-as3.png)
+
+### 4. User Preferences & Settings
+![Admin UI 2](./screenshots/li-as4.png)
+
+### 5. Content Generation & History
+![Admin UI 3](./screenshots/li-as5.png)
 
 ## Author
 **Pubudu Bandara**
