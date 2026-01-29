@@ -223,13 +223,13 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
 ### 2. LinkedIn Login
 ![LinkedIn Login](./screenshots/li-as2.png)
 
-### 3. Admin Dashboard
+### 3. User Dashboard
 ![Admin UI 1](./screenshots/li-as3.png)
 
-### 4. User Preferences & Settings
+### 4. User Preferences 
 ![Admin UI 2](./screenshots/li-as4.png)
 
-### 5. Content Generation & History
+### 5. Content Generation 
 ![Admin UI 3](./screenshots/li-as5.png)
 
 ## Author
