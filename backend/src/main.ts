@@ -7,7 +7,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  app.enableCors();
+  // Enable CORS with credentials
+  app.enableCors({
+    origin: configService.get<string>('FRONTEND_URL') || 'http://localhost:3001',
+    credentials: true,
+  });
 
   // Add Session Middleware
   app.use(

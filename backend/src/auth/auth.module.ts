@@ -11,9 +11,10 @@ import { PassportModule } from '@nestjs/passport';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, LinkedInAccount, OAuthToken]),
-    PassportModule,
+    PassportModule.register({ session: true }),
   ],
   providers: [AuthService, LinkedInStrategy],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

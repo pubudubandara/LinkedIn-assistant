@@ -76,4 +76,11 @@ export class AuthService {
 
     return savedUser;
   }
+
+  async findUserById(userId: number) {
+    return this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['linkedinAccount'],
+    });
+  }
 }
