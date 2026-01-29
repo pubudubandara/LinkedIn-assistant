@@ -3,10 +3,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-interface PreferencesFormProps {
-  userId: string;
-}
-
 interface FormData {
   role: string;
   goals: string;
@@ -15,14 +11,13 @@ interface FormData {
   content_tone: string;
 }
 
-export default function PreferencesForm({ userId }: PreferencesFormProps) {
-  const [formData, setFormData] = useState<FormData>({
-    role: '',
-    goals: '',
-    challenges: '',
-    target_country: 'USA',
-    content_tone: 'Professional',
-  });
+interface PreferencesFormProps {
+  userId: string;
+  currentPreferences: FormData;
+  setCurrentPreferences: (prefs: FormData) => void;
+}
+
+export default function PreferencesForm({ userId, currentPreferences, setCurrentPreferences }: PreferencesFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -33,7 +28,7 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
       })
         .then((response) => {
           if (response.data.preference) {
-            setFormData({
+            setCurrentPreferences({
               role: response.data.preference.role,
               goals: response.data.preference.goals,
               challenges: response.data.preference.challenges,
@@ -54,7 +49,7 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
     e.preventDefault();
     setSaving(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/preferences`, formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/preferences`, currentPreferences, {
         withCredentials: true
       });
       alert('Preferences Saved Successfully!');
@@ -84,8 +79,8 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
             <input 
               type="text" 
               className="mt-1 w-full border rounded p-2 text-sm" 
-              value={formData.role} 
-              onChange={(e) => setFormData({...formData, role: e.target.value})} 
+              value={currentPreferences.role} 
+              onChange={(e) => setCurrentPreferences({...currentPreferences, role: e.target.value})} 
               required 
             />
           </div>
@@ -94,8 +89,8 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
             <input 
               type="text" 
               className="mt-1 w-full border rounded p-2 text-sm" 
-              value={formData.target_country} 
-              onChange={(e) => setFormData({...formData, target_country: e.target.value})} 
+              value={currentPreferences.target_country} 
+              onChange={(e) => setCurrentPreferences({...currentPreferences, target_country: e.target.value})} 
             />
           </div>
         </div>
@@ -105,8 +100,8 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
           <textarea 
             className="mt-1 w-full border rounded p-2 text-sm" 
             rows={2} 
-            value={formData.goals} 
-            onChange={(e) => setFormData({...formData, goals: e.target.value})} 
+            value={currentPreferences.goals} 
+            onChange={(e) => setCurrentPreferences({...currentPreferences, goals: e.target.value})} 
             required 
           />
         </div>
@@ -116,8 +111,8 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
           <textarea 
             className="mt-1 w-full border rounded p-2 text-sm" 
             rows={2} 
-            value={formData.challenges} 
-            onChange={(e) => setFormData({...formData, challenges: e.target.value})} 
+            value={currentPreferences.challenges} 
+            onChange={(e) => setCurrentPreferences({...currentPreferences, challenges: e.target.value})} 
             required 
           />
         </div>
@@ -126,8 +121,8 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
           <label className="block text-sm font-medium text-gray-700">Content Tone</label>
           <select 
             className="mt-1 w-full border rounded p-2 text-sm" 
-            value={formData.content_tone} 
-            onChange={(e) => setFormData({...formData, content_tone: e.target.value})}
+            value={currentPreferences.content_tone} 
+            onChange={(e) => setCurrentPreferences({...currentPreferences, content_tone: e.target.value})}
           >
             <option value="Professional">Professional</option>
             <option value="Casual">Casual</option>

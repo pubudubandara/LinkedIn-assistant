@@ -7,12 +7,27 @@ import PreferencesForm from '@/components/PreferencesForm';
 import PostGenerator from '@/components/PostGenerator';
 import PostHistory from '@/components/PostHistory';
 
+interface FormData {
+  role: string;
+  goals: string;
+  challenges: string;
+  target_country: string;
+  content_tone: string;
+}
+
 function DashboardContent() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPreferences, setCurrentPreferences] = useState<FormData>({
+    role: '',
+    goals: '',
+    challenges: '',
+    target_country: 'Sri Lanka',
+    content_tone: 'Professional',
+  });
 
   // Check authentication with backend session
   useEffect(() => {
@@ -93,14 +108,14 @@ function DashboardContent() {
                <ProfileCard userId={userId} />
             </div>
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-               <PreferencesForm userId={userId} />
+               <PreferencesForm userId={userId} currentPreferences={currentPreferences} setCurrentPreferences={setCurrentPreferences} />
             </div>
           </div>
 
           {/* Right Column: Generator & History */}
           <div className="lg:col-span-3 space-y-6">
              <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 border border-gray-200">
-                <PostGenerator userId={userId} onPostPublished={handlePostPublished} />
+                <PostGenerator userId={userId} onPostPublished={handlePostPublished} currentPreferences={currentPreferences} />
              </div>
              
              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">

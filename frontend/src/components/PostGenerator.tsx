@@ -3,12 +3,21 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+interface FormData {
+  role: string;
+  goals: string;
+  challenges: string;
+  target_country: string;
+  content_tone: string;
+}
+
 interface PostGeneratorProps {
   userId: string;
   onPostPublished?: () => void;
+  currentPreferences: FormData;
 }
 
-export default function PostGenerator({ userId, onPostPublished }: PostGeneratorProps) {
+export default function PostGenerator({ userId, onPostPublished, currentPreferences }: PostGeneratorProps) {
   const [generatedPost, setGeneratedPost] = useState('');
   const [generating, setGenerating] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -17,9 +26,11 @@ export default function PostGenerator({ userId, onPostPublished }: PostGenerator
     setGenerating(true);
     setGeneratedPost('');
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/generate/${userId}`, {}, {
-        withCredentials: true
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/generate/${userId}`,
+        { preferences: currentPreferences },
+        { withCredentials: true }
+      );
       setGeneratedPost(response.data.content);
     } catch (error) {
       console.error(error);
