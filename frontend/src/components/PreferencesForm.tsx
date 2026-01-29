@@ -20,6 +20,7 @@ interface PreferencesFormProps {
 export default function PreferencesForm({ userId, currentPreferences, setCurrentPreferences }: PreferencesFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Partial<FormData>>({});
 
   useEffect(() => {
     if (userId) {
@@ -45,16 +46,72 @@ export default function PreferencesForm({ userId, currentPreferences, setCurrent
     }
   }, [userId]);
 
+  const validateForm = (): boolean => {
+    const newErrors: Partial<FormData> = {};
+
+    // Role validation
+    if (!currentPreferences.role.trim()) {
+      newErrors.role = 'Role is required';
+    } else if (currentPreferences.role.trim().length < 2) {
+      newErrors.role = 'Role must be at least 2 characters';
+    } else if (currentPreferences.role.length > 100) {
+      newErrors.role = 'Role must not exceed 100 characters';
+    }
+
+    // Goals validation
+    if (!currentPreferences.goals.trim()) {
+      newErrors.goals = 'Career goals are required';
+    } else if (currentPreferences.goals.trim().length < 10) {
+      newErrors.goals = 'Goals must be at least 10 characters';
+    } else if (currentPreferences.goals.length > 500) {
+      newErrors.goals = 'Goals must not exceed 500 characters';
+    }
+
+    // Challenges validation
+    if (!currentPreferences.challenges.trim()) {
+      newErrors.challenges = 'Challenges are required';
+    } else if (currentPreferences.challenges.trim().length < 10) {
+      newErrors.challenges = 'Challenges must be at least 10 characters';
+    } else if (currentPreferences.challenges.length > 500) {
+      newErrors.challenges = 'Challenges must not exceed 500 characters';
+    }
+
+    // Target country validation
+    if (!currentPreferences.target_country.trim()) {
+      newErrors.target_country = 'Target country is required';
+    } else if (currentPreferences.target_country.trim().length < 2) {
+      newErrors.target_country = 'Target country must be at least 2 characters';
+    } else if (currentPreferences.target_country.length > 100) {
+      newErrors.target_country = 'Target country must not exceed 100 characters';
+    }
+
+    // Content tone validation
+    const validTones = ['Professional', 'Casual', 'Inspirational', 'Funny'];
+    if (!validTones.includes(currentPreferences.content_tone)) {
+      newErrors.content_tone = 'Invalid content tone';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSavePreferences = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setSaving(true);
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/preferences`, currentPreferences, {
         withCredentials: true
       });
       alert('Preferences Saved Successfully!');
-    } catch (error) {
-      alert('Failed to save preferences');
+      setErrors({});
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to save preferences';
+      alert(Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage);
     }
     setSaving(false);
   };
@@ -78,49 +135,54 @@ export default function PreferencesForm({ userId, currentPreferences, setCurrent
             <label className="block text-sm font-medium text-gray-700">Role / Title</label>
             <input 
               type="text" 
-              className="mt-1 w-full border rounded p-2 text-sm" 
+              className={`mt-1 w-full border rounded p-2 text-sm ${errors.role ? 'border-red-500' : ''}`}
               value={currentPreferences.role} 
               onChange={(e) => setCurrentPreferences({...currentPreferences, role: e.target.value})} 
-              required 
+              maxLength={100}
             />
+            {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Target Country</label>
             <input 
               type="text" 
-              className="mt-1 w-full border rounded p-2 text-sm" 
+              className={`mt-1 w-full border rounded p-2 text-sm ${errors.target_country ? 'border-red-500' : ''}`}
               value={currentPreferences.target_country} 
               onChange={(e) => setCurrentPreferences({...currentPreferences, target_country: e.target.value})} 
+              maxLength={100}
             />
+            {errors.target_country && <p className="text-red-500 text-xs mt-1">{errors.target_country}</p>}
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Career Goals</label>
           <textarea 
-            className="mt-1 w-full border rounded p-2 text-sm" 
+            className={`mt-1 w-full border rounded p-2 text-sm ${errors.goals ? 'border-red-500' : ''}`}
             rows={2} 
             value={currentPreferences.goals} 
             onChange={(e) => setCurrentPreferences({...currentPreferences, goals: e.target.value})} 
-            required 
+            maxLength={500}
           />
+          {errors.goals && <p className="text-red-500 text-xs mt-1">{errors.goals}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Key Challenges</label>
           <textarea 
-            className="mt-1 w-full border rounded p-2 text-sm" 
+            className={`mt-1 w-full border rounded p-2 text-sm ${errors.challenges ? 'border-red-500' : ''}`}
             rows={2} 
             value={currentPreferences.challenges} 
             onChange={(e) => setCurrentPreferences({...currentPreferences, challenges: e.target.value})} 
-            required 
+            maxLength={500}
           />
+          {errors.challenges && <p className="text-red-500 text-xs mt-1">{errors.challenges}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Content Tone</label>
           <select 
-            className="mt-1 w-full border rounded p-2 text-sm" 
+            className={`mt-1 w-full border rounded p-2 text-sm ${errors.content_tone ? 'border-red-500' : ''}`}
             value={currentPreferences.content_tone} 
             onChange={(e) => setCurrentPreferences({...currentPreferences, content_tone: e.target.value})}
           >
@@ -129,6 +191,7 @@ export default function PreferencesForm({ userId, currentPreferences, setCurrent
             <option value="Inspirational">Inspirational</option>
             <option value="Funny">Funny</option>
           </select>
+          {errors.content_tone && <p className="text-red-500 text-xs mt-1">{errors.content_tone}</p>}
         </div>
 
         <button 
