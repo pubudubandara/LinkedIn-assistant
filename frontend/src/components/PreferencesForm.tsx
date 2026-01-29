@@ -28,7 +28,9 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`)
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`, {
+        withCredentials: true
+      })
         .then((response) => {
           if (response.data.preference) {
             setFormData({
@@ -52,7 +54,9 @@ export default function PreferencesForm({ userId }: PreferencesFormProps) {
     e.preventDefault();
     setSaving(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/preferences`, formData);
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}/preferences`, formData, {
+        withCredentials: true
+      });
       alert('Preferences Saved Successfully!');
     } catch (error) {
       alert('Failed to save preferences');

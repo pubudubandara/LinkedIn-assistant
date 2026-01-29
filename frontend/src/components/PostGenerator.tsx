@@ -17,7 +17,9 @@ export default function PostGenerator({ userId, onPostPublished }: PostGenerator
     setGenerating(true);
     setGeneratedPost('');
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/generate/${userId}`);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/generate/${userId}`, {}, {
+        withCredentials: true
+      });
       setGeneratedPost(response.data.content);
     } catch (error) {
       console.error(error);
@@ -32,6 +34,8 @@ export default function PostGenerator({ userId, onPostPublished }: PostGenerator
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/publish/${userId}`, {
         content: generatedPost
+      }, {
+        withCredentials: true
       });
       alert('Post Published Successfully! 🚀');
       if (onPostPublished) onPostPublished();

@@ -23,7 +23,9 @@ export default function PostHistory({ userId, refreshTrigger }: PostHistoryProps
   const fetchHistory = () => {
     if (userId) {
       setLoading(true);
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/history/${userId}`)
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/history/${userId}`, {
+        withCredentials: true
+      })
         .then((res) => {
           setPostHistory(res.data);
           setLoading(false);
