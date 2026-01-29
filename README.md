@@ -74,6 +74,7 @@ LinkedIn-MVP-Assistant/
     ├── src/
     │   ├── app/
     │   │   ├── dashboard/     # Main Dashboard Page
+    │   │   │   └── [id]/
     │   │   └── layout.js
     │   └── components/        # Reusable UI Components
     └── package.json
