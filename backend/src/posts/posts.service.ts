@@ -28,13 +28,25 @@ export class PostsService {
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   }
 
-  async generatePost(userId: number) {
+  async generatePost(userId: number, providedPreferences?: any) {
     // 1. Get User and Preferences
     const user = await this.usersService.findOne(userId);
-    const prefs = user.preference;
+    let prefs = providedPreferences;
 
-    if (!prefs) {
-      throw new NotFoundException('User preferences not found. Please set them first.');
+    // If no preferences provided or any field is empty, use saved preferences
+    if (!prefs || !prefs.role || !prefs.goals || !prefs.challenges || !prefs.target_country || !prefs.content_tone) {
+      const savedPrefs = user.preference;
+      if (!savedPrefs) {
+        throw new NotFoundException('User preferences not found. Please set them first.');
+      }
+      // Use saved preferences for missing fields
+      prefs = {
+        role: (prefs?.role && prefs.role.trim()) || savedPrefs.role,
+        goals: (prefs?.goals && prefs.goals.trim()) || savedPrefs.goals,
+        challenges: (prefs?.challenges && prefs.challenges.trim()) || savedPrefs.challenges,
+        target_country: (prefs?.target_country && prefs.target_country.trim()) || savedPrefs.target_country,
+        content_tone: (prefs?.content_tone && prefs.content_tone.trim()) || savedPrefs.content_tone,
+      };
     }
 
     // 2. Prepare the Prompt
@@ -148,5 +160,13 @@ export class PostsService {
 
       throw new Error('Failed to publish to LinkedIn.');
     }
+  }
+
+  // 4. Function to get User's Post History
+  async getPostsByUser(userId: number) {
+    return this.postsRepository.find({
+      where: { linkedinAccount: { user: { id: userId } } },
+      order: { created_at: 'DESC' }, // Show newest ones first
+    });
   }
 }

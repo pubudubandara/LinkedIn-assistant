@@ -25,11 +25,33 @@ export class AuthController {
     // After validation by the strategy, user data is available in req.user
     const user = await this.authService.validateUser(req.user);
     
-    // Redirect to the Frontend (Get Frontend URL from .env)
-    // Example: http://localhost:3001/dashboard?userId=1
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    // Store user ID in session
+    req.session.userId = user.id;
     
-    // For now, simply send the user ID as a query param (In production, use JWT Cookies)
-    res.redirect(`${frontendUrl}/dashboard?id=${user.id}`);
+    // Redirect to the Frontend
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    res.redirect(`${frontendUrl}/dashboard`);
+  }
+
+  // 3. Logout Route
+  @Get('logout')
+  async logout(@Req() req, @Res() res: Response) {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Could not log out' });
+      }
+      res.clearCookie('connect.sid');
+      return res.status(200).json({ message: 'Logged out successfully' });
+    });
+  }
+
+  // 4. Check auth status
+  @Get('me')
+  async getMe(@Req() req) {
+    if (!req.session || !req.session.userId) {
+      return { authenticated: false };
+    }
+    const user = await this.authService.findUserById(req.session.userId);
+    return { authenticated: true, user };
   }
 }
