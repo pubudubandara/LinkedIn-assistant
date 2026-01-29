@@ -24,7 +24,9 @@ export default function ProfileCard({ userId }: ProfileCardProps) {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`)
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`, {
+        withCredentials: true
+      })
         .then((response) => {
           setUser(response.data);
           setLoading(false);

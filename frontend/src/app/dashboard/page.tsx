@@ -1,34 +1,63 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ProfileCard from '@/components/ProfileCard';
 import PreferencesForm from '@/components/PreferencesForm';
 import PostGenerator from '@/components/PostGenerator';
 import PostHistory from '@/components/PostHistory';
 
 function DashboardContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Route Protection Logic
+  // Check authentication with backend session
   useEffect(() => {
-    const id = searchParams.get('id');
-    
-    if (!id) {
-      router.push('/');
-    } else {
-      setUserId(id);
-    }
-  }, [searchParams, router]);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/me`, {
+          credentials: 'include', // Important: send cookies with request
+        });
+        
+        const data = await response.json();
+        
+        if (data.authenticated && data.user) {
+          setIsAuthenticated(true);
+          setUserId(data.user.id.toString());
+        } else {
+          router.push('/');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handlePostPublished = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  if (!userId) return (
+  const handleLogout = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      router.push('/');
+    }
+  };
+
+  if (isLoading || !userId) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center space-y-4">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -48,7 +77,7 @@ function DashboardContent() {
              <p className="text-gray-500 mt-1">Create and manage AI-powered LinkedIn posts</p>
            </div>
            <button 
-             onClick={() => router.push('/')} 
+             onClick={handleLogout} 
              className="mt-4 md:mt-0 bg-red-50 text-red-600 hover:bg-red-100 px-5 py-2 rounded-lg font-semibold transition-colors border border-red-200"
            >
              Logout
