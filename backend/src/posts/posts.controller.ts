@@ -8,8 +8,11 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post('generate/:userId')
-  async generatePost(@Param('userId') userId: string) {
-    return this.postsService.generatePost(+userId);
+  async generatePost(
+    @Param('userId') userId: string,
+    @Body('preferences') preferences?: any,
+  ) {
+    return this.postsService.generatePost(+userId, preferences);
   }
 
   // POST http://localhost:3000/posts/publish/1
